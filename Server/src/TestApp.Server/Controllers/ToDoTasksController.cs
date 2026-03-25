@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OutputCaching;
@@ -108,6 +109,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> CreateTask([FromBody] ToDoItemDTO newTask)
     {
       try
@@ -139,6 +141,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> EditTask(int id, [FromBody] ToDoItemDTO updatedTask)
     {
       try
@@ -184,6 +187,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> AddTagToTask(int taskId, string tag)
     {
       try
@@ -221,6 +225,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> RemoveTagFromTask(int taskId, int tagId)
     {
       try
@@ -257,6 +262,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> DeleteTask(int id)
     {
       try

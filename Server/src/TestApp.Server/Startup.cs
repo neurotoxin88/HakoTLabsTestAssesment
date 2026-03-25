@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.ModelBuilder;
+using System.Text;
 using System.Text.Json.Serialization;
+using TestApp.Server.Settings;
 using TestApp.ToDoList.Entity;
 using TestApp.ToDoList.Module;
 using TestApp.ToDoList.Repository;
@@ -22,6 +26,28 @@ namespace TestApp.Server
     {
       // Add DB
       services.AddDbContext<ToDoListDbContext>();
+
+
+      services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+
+      var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
+
+      services.AddAuthentication(options =>
+      {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+      })
+      .AddJwtBearer(options =>
+      {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+          ValidateIssuer = false,
+          ValidateAudience = false,
+          ValidateLifetime = true,
+          ValidateIssuerSigningKey = true,
+          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+        };
+      });
 
       services.AddOutputCache();
 
@@ -64,6 +90,30 @@ namespace TestApp.Server
 
         options.IncludeXmlComments(xmlPath);
         options.OperationFilter<ODataQueryOptionsOperationFilter>();
+        options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        {
+          Name = "Authorization",
+          Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+          Scheme = "bearer",
+          BearerFormat = "JWT",
+          In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+          Description = "Enter JWT token"
+        });
+
+        options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
       });
     }
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider svcProv)
@@ -78,7 +128,9 @@ namespace TestApp.Server
       appLifetime.ApplicationStarted.Register(onApplicationStarted);
 
       app.UseRouting();
-      
+
+      app.UseAuthentication();
+
       app.UseAuthorization();
 
       app.UseCors();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TestApp.Server.DTOs;
 using TestApp.ToDoList.Entity;
@@ -51,6 +52,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> CreateTag([FromBody] ToDoTagDTO newTag)
     {
       try
@@ -82,6 +84,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> EditTag(int id, [FromBody] ToDoTagDTO updatedTag)
     {
       try
@@ -124,6 +127,7 @@ namespace TestApp.Server.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize]
     public ActionResult<ToDoItem> DeleteTag(int id)
     {
       try
